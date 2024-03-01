@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:campo_minado/components/tabuleiro_widget.dart';
 import 'package:campo_minado/models/explosao_exception.dart';
 import 'package:campo_minado/models/tabuleiro.dart';
@@ -84,6 +86,24 @@ class _CampoMinadoAppState extends State<CampoMinadoApp> {
     } catch (e) {}
   }
 
+  void _showErrorDialog(String msg) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          'Ocorreu um erro',
+        ),
+        content: Text(msg, style: const TextStyle(fontSize: 20)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Fechar'),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -105,6 +125,7 @@ class _CampoMinadoAppState extends State<CampoMinadoApp> {
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           color: Colors.white),
                       child: TextFormField(
+                        maxLength: 3,
                         onChanged: (text) {
                           if (text != '') {
                             _setTotalBomba(int.parse(text));
@@ -112,8 +133,13 @@ class _CampoMinadoAppState extends State<CampoMinadoApp> {
                             _setTotalBomba(1);
                           }
                         },
-                        onFieldSubmitted: (_) {
-                          recomecar(context);
+                        onFieldSubmitted: (text) {
+                          if (int.parse(text) > 359) {
+                            _showErrorDialog('Valor muito alto!');
+                            _setTotalBomba(1);
+                          } else {
+                            recomecar(context);
+                          }
                         },
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
